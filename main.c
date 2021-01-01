@@ -11,9 +11,9 @@
 //#include "backwards_avx.h"
 //#include "branchless_forward_double_text_small_jump_preprocessing.h"
 //#include "SMART_Test.h"
-//#include "SMART_TEST_1.h"
+#include "SMART_CODE_1.h"
 //#include "SMART_TEST_3.h"
-#include "SMART_TEST_4.h"
+//#include "SMART_TEST_4.h"
 //#include "perm_tests.h"
 
 #include <stdio.h>
@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-#include "SMART_TESTING.h"
+#include "SMART_TESTS.h"
 
 // For printing with colors
 #define COLOR_RED   "\x1b[31m"
