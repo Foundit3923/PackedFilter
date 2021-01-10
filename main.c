@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
-#include "SMART_TESTS.h"
+//#include "SMART_TESTS.h"
 
 // For printing with colors
 #define COLOR_RED   "\x1b[31m"
@@ -1673,7 +1673,7 @@ int main() {
         expect("abababbbbb", "babbbbb", true, "Text: abababbbbb, Query: babbbbb");
         expect("abababbbbb", "bababb", true, "Text: abababbbbb, Query: bababb");
          */
-        s_test();
+        //s_test();
         /*
         expect("abc", "********a********b********c********", true,
                "Term: abc Query: ********a********b********c********");
