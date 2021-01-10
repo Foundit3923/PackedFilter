@@ -1,6 +1,6 @@
 //
 // Created by michael on 8/29/20.
-//
+// PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International 
 
 #include <stdio.h>
 #include <stdint.h>
