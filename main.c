@@ -1,3 +1,5 @@
+// PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International 
+
 //#include "intro.h"
 //#include "branchless_backward.h"
 //#include "branchless_backward_double_test.h"
