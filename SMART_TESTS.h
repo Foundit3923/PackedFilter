@@ -1,6 +1,6 @@
 //
 // Created by michael on 9/21/20.
-//
+// PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International 
 
 /*
  * SMART: string matching algorithms research tool.
