@@ -59,7 +59,7 @@ int search_test (unsigned char* query_array,
     //While there's text left
     while(!(&*t_w.c > &st[text_len-1])) {
         
-        //Make a single character mask
+        //Make a single character mask and compare with text window
         value = (~((*t_w.i) ^ query_matches * (*char_ptr)) & ~((*t_w.i) ^ LAST_BITS_ON * (*char_ptr)));
         
         //Recude the single character mask to a bool array 
