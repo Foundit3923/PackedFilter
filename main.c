@@ -196,6 +196,8 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
         r[0] = 0;
     }
     r[1] = cpu_time_used;
+    
+    free(locations);
     return r;
 
 }
@@ -207,8 +209,6 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
     double ret[2];// = (double*) malloc(sizeof(double));
     bool result = false;
     if( test == 0 || test == 1) {
-        //This setup will need to be changed for the new version. Or the krauss algo will need to be modified to take the
-        //same parameters. No need to use them though
         int term_len = strlen(init_term);
         int query_len = strlen(init_query+1);
         t_init_term = (char *) malloc(term_len);
@@ -307,7 +307,11 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
 
     tests_run++;
     criteria_are_met = true;
-
+    
+    free(t_init_term);
+    free(t_init_query);
+    free(temp_query);
+    free(rev);
 }
 
 void generate_full_masks(){
@@ -843,103 +847,6 @@ int main() {
                 //   "Term: Have you gazed on naked grandeur where there's nothing else to gaze on, set pieces and drop-curtain scenes galore, big mountians heaved to heaven, which the blinding sunsets blazon, black canyons where the rapids rip and roar? Have you swept the visioned valley with the green stream streaking through it, searched the vastness for a something you have lost? Have you strung your soul to silence? Then for God's sake go and do it; Hear the challenge, learn the lesson, pay the cost. Query: b");
             }
         }
-
-        /*SMART-Tests
-
-        expect("aaaaaaaaaa", "a", true, "Text: aaaaaaaaaa, Query: a");
-        expect("aaaaaaaaaa", "aa", true, "Text: aaaaaaaaaa, Query: aa");
-        expect("aaaaaaaaaa", "aaaaaaaaaa", true, "Text: aaaaaaaaaa, Query: aaaaaaaaaa");
-        expect("aaaaaaaaaa", "b", false, "Text: aaaaaaaaaa, Query: b");
-        expect("ababababab", "ab", true, "Text: ababababab, Query: ab");
-        expect("ababababab", "a", true, "Text: ababababab, Query: a");
-        expect("ababababab", "aba", true, "Text: ababababab, Query: aba");
-        expect("ababababab", "abc", false, "Text: ababababab, Query: abc");
-        expect("ababababab", "ba", true, "Text: ababababab, Query: ba");
-        expect("ababababab", "babbbbb", false, "Text: ababababab, Query: babbbbb");
-        expect("bcdefghilm", "bcdefg", true, "Text: bcdefghilm, Query: bcdefg");
-        int h;
-        char *T,*P;
-        bool result = false;
-        char* message;
-        unsigned char* message_text = "Text: ";
-        for(h=0; h<10; h++) T[h] = rand()%128;
-        for(h=0; h<4; h++) P[h] = T[h];
-        T[YSIZE] = P[4] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<10; h++) T[h] = rand()%128;
-        for(h=0; h<4; h++) P[h] = T[h];
-        T[10] = P[4] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<64; h++) T[h] = rand()%128;
-        for(h=0; h<40; h++) P[h] = T[h];
-        T[64] = P[40] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<64; h++) T[h] = rand()%128;
-        for(h=0; h<40; h++) P[h] = T[h];
-        T[64] = P[40] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<64; h++) T[h] = 'a';
-        for(h=0; h<40; h++) P[h] = 'a';
-        T[64] = P[40] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<64; h+=2) T[h] = 'a';
-        for(h=1; h<64; h+=2) T[h] = 'b';
-        for(h=0; h<40; h+=2) P[h] = 'a';
-        for(h=1; h<40; h+=2) P[h] = 'b';
-        T[64] = P[40] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        result = false;
-        for(h=0; h<64; h+=2) T[h] = 'a';
-        for(h=1; h<64; h+=2) T[h] = 'b';
-        for(h=0; h<40; h+=2) P[h] = 'a';
-        for(h=1; h<40; h+=2) P[h] = 'b';
-        P[39] = 'c';
-        T[64] = P[40] = '\0';
-        if(test_search((unsigned char*)P,4,(unsigned char*)T,10)){result = true;}
-        strcat(message, "Text: ");
-        strcat(message, T);
-        strcat(message, ", Query: ");
-        strcat(message, P);
-        expect(T, P, result, message);
-        expect("abababbbbb", "babbbbb", true, "Text: abababbbbb, Query: babbbbb");
-        expect("abababbbbb", "bababb", true, "Text: abababbbbb, Query: bababb");
-         */
-        //s_test();
         /*
         expect("abc", "********a********b********c********", true,
                "Term: abc Query: ********a********b********c********");
@@ -950,7 +857,6 @@ int main() {
         expect("monkeys*", "*m*o*n*k*e*y*s*", true, " ");
         printf("\n");
          */
-        //free(query_64);
 
         printf("Ran %d tests with %d passes and %d failures\n", tests_run, tests_passed, tests_failed);
 
