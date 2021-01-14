@@ -312,6 +312,7 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
     free(t_init_query);
     free(temp_query);
     free(rev);
+    free(expected_return);
 }
 
 void generate_full_masks(){
