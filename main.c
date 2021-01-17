@@ -1,30 +1,15 @@
-// PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International 
+// PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International
 
-//#include "intro.h"
-//#include "branchless_backward.h"
-//#include "branchless_backward_double_test.h"
-//#include "branchless_foreward_double_test.h"
-//#include "branchless_forward_Double_multithread.h"
-//#include "super_packed.h"
-//#include "big_check.h"
-//#include "branchless_foreward_double_test_small_jump.h"
-//#include "branchless_backward_small_jump.h"
-//#include "branchless_bidirectional_multi_thread.h"
-//#include "backwards_avx.h"
-//#include "branchless_forward_double_text_small_jump_preprocessing.h"
-//#include "SMART_Test.h"
 #include "SMART_CODE_1.h"
-//#include "SMART_TEST_3.h"
-//#include "SMART_TEST_4.h"
-//#include "perm_tests.h"
+//#include "super_packed.h"
+
 
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h>
-//#include "SMART_TESTS.h"
+#include <time.h"
 
 // For printing with colors
 #define COLOR_RED   "\x1b[31m"
@@ -34,9 +19,6 @@
 
 // Feature set to test for
 #define ARBITRARY_TERM_LENGTH true
-#define SINGLE_CHARACATER_WILDCARDS false
-#define WILDCARD_IN_TERM true
-#define DELIMITER "*"
 
 int tests_run = 0;
 int tests_passed = 0;
@@ -44,28 +26,18 @@ int tests_failed = 0;
 int test = 0;
 int my_count = 0;
 int krauss_count = 0;
-int wild_count = 0;
-int test_count = 0;
 int* rev;
 
 uint64_t full_mask[128];
 
 uint64_t anchor_check[8] = {255,65280,16711680,4278190080,1095216660480,280375465082880,71776119061217280,18374686479671624000};
 
-char** subquery;
 char* query;
 
 double my_time[76];
 double krauss_time[76];
 uint64_t term = 0;
-char* t_init_term;
-char* t_init_query;
 bool criteria_are_met = true;
-bool anchored_beginning = false;
-bool anchored_end = false;
-bool same_string = false;
-bool first_subquery;
-bool last_subquery;
 bool KMP = false;
 
 int test_search(unsigned char *x, int m, unsigned char *y, int n) {
@@ -90,7 +62,7 @@ void remove_all_chars(char* str, char c) {
     *pw = '\0';
 }
 
-double* run_tests(char* init_query, char* init_term, bool criteria_are_met, double cpu_time_used, double* r) {
+double* run_tests(char* init_query, int query_len, char* init_term, int text_len, bool criteria_are_met, double cpu_time_used, double* r) {
     bool result = false;
     int result_count = 0;
     double* test_time = my_time;
@@ -98,18 +70,16 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
     //Wildfilter//
     //----------//
     if(test == 0) {
-        
+
         clock_t start;
         clock_t first_time = time(NULL);
         clock_t end;
         start = clock();
 
-                /*
- * Pre-processing
+        /*
+* Pre-processing
 */
         int text_modifier = 0;
-        int text_len = strlen(t_init_term);
-        int query_len = strlen(init_query);
         int i = 0;
         uint64_t value;
         uint64_t value2;
@@ -117,27 +87,26 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
         char empty[text_len][query_len];
         char** locations = (char**) malloc(sizeof(char*) * text_len);
         *locations = *empty;
-        //memset(locations, 0, sizeof(locations[0][0]) * text_len);
         char* last;
         last = &init_query[query_len-1];
 
         union Window t_w;
-        t_w.c = (unsigned char*) &t_init_term[text_modifier];
+        t_w.c = (unsigned char*) &init_term[text_modifier];
 
         union Query q;
         q.c = (unsigned char*) &init_query[0];
         for(text_modifier = 0; text_modifier < text_len; text_modifier+=8){
-            t_w.c = (unsigned char*) &t_init_term[text_modifier];
+            t_w.c = (unsigned char*) &init_term[text_modifier];
             value = ~((*t_w.i) ^ (LAST_BITS_ON  * (*q.c)));
             if(hassetbyte(value)){
-                t_w.c = (unsigned char*) &t_init_term[text_modifier + query_len-1];
+                t_w.c = (unsigned char*) &init_term[text_modifier + query_len-1];
                 value2 = ~((*t_w.i) ^ ((LAST_BITS_ON & query_matches) * (*last)));
                 if(hassetbyte(value2)) {
                     query_matches = value & (value >> 4) & 0xF0F0F0F0F0F0F0FUL;
                     query_matches = ((query_matches & (query_matches >> 2)) &
                                      ((query_matches & (query_matches >> 2)) >> 1));
                     if(query_matches && value2) {
-                        locations[i] = &t_init_term[text_modifier];
+                        locations[i] = &init_term[text_modifier];
                         i++;
                     }
                 }
@@ -154,7 +123,7 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
             //result = Experimental_wildcard_arbitrary_length_moving_union_save(t_init_term, init_query, locations, i);
             //result = Experimental_wildcard_arbitrary_length_moving_union_save(t_init_term, init_query);
             //result = search_test((unsigned char*) init_query,strlen(init_query),(unsigned char*) t_init_term,strlen(t_init_term));
-            result_count = search_test((unsigned char*) init_query,strlen(init_query),(unsigned char*) t_init_term,strlen(t_init_term));
+            result_count = search_test((unsigned char*) init_query,query_len,(unsigned char*) init_term, text_len);
         }
         clock_t second_time = time(NULL);
         end = clock();
@@ -168,6 +137,7 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
 
         my_time[my_count] = cpu_time_used;
         my_count++;
+        free(locations);
     }
 
         //-----------//,
@@ -196,8 +166,8 @@ double* run_tests(char* init_query, char* init_term, bool criteria_are_met, doub
         r[0] = 0;
     }
     r[1] = cpu_time_used;
-    
-    free(locations);
+
+
     return r;
 
 }
@@ -211,55 +181,9 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
     if( test == 0 || test == 1) {
         int term_len = strlen(init_term);
         int query_len = strlen(init_query+1);
-        t_init_term = (char *) malloc(term_len);
-        t_init_query = (char *) malloc(query_len);
-        //query_64 = (struct DataItem *) malloc(sizeof(struct DataItem));
-
-        char *temp_query = (char *) malloc(query_len);
         rev = (int*) malloc(sizeof(term_len));
-
-        //init_query[0] = '\000';
-        //strncpy(t_init_term, init_term, term_len);
-        strcpy(t_init_query, &init_query[0]);
-        //t_init_query[query_len] = '!';
-        t_init_query[query_len+1] = '\0';
-        //t_init_term[term_len] = '\0';
-        //t_init_query[query_len] = '\0';
-
-        clock_t start1;
-        clock_t end1;
-        start1 = clock();
-        int begin = 0;
-        int end = 0;
-        int count = 0;
-
-/*
-        t_init_query[0] = init_query[strlen(init_query)-1];
-        for(count = 0; count < strlen(init_query)-1; count++){
-            t_init_query[count+1] = init_query[count];
-        }
-        t_init_query[strlen(init_query)] = '\0';
-
-
-        t_init_query[begin] = '\0';
-        count = term_len;
-        int up_count = 0;
-        while (count >= 0) {
-            rev[up_count] = count;
-            up_count++;
-            count--;
-        }
-*/
-        preprocessing(t_init_term, t_init_query, init_term, temp_query, term_len, query_len+2);
-        end1 = clock();
-        prepro_cpu_time_used = ((double) (end1 - start1));// * CLOCKS_PER_SEC;
+        *ret = *run_tests(init_query, query_len, init_term, term_len, criteria_are_met, cpu_time_used, ret);
     }
-
-    //for debugging purposes
-    bool check = criteria_are_met;
-
-
-    *ret = *run_tests(t_init_query, init_term, criteria_are_met, cpu_time_used, ret);
 
     if(ret[0] == 0){
         result = false;
@@ -267,12 +191,11 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
         result = true;
     }
     cpu_time_used += ret[1];
-    //cpu_time_used += prepro_cpu_time_used;
 
     //-----------//
     //PrintResult//
     //-----------//
-    char *expected_return = (char*) malloc(sizeof(char));
+    char *expected_return;
     if (expectation == true) expected_return = "true";
     else expected_return = "false";
 
@@ -307,12 +230,7 @@ void expect(char* init_term, char* init_query, bool expectation, char* message)
 
     tests_run++;
     criteria_are_met = true;
-    
-    free(t_init_term);
-    free(t_init_query);
-    free(temp_query);
     free(rev);
-    free(expected_return);
 }
 
 void generate_full_masks(){
