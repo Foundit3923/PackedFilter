@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <time.h"
+#include <time.h>
 
 // For printing with colors
 #define COLOR_RED   "\x1b[31m"
