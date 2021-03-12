@@ -1,0 +1,11 @@
+Shift all bytes with active bits to the rightmost position:
+
+    t_w.c = "abcdefgh";
+
+    uint64_t isolated_chars = *t_w.i & (0x100010000UL * 255);
+
+    uint64_t left_mask = ~((isolated_chars * (LAST_BITS_ON * 255)) | isolated_chars);
+
+    uint64_t match_comparison = isolated_chars / left_mask ;
+
+------------------------------------------------------------------------------------------------------------------------
