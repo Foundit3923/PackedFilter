@@ -82,7 +82,7 @@ int search_test (unsigned char* query_array,
 
     int mismatch_move_count = 0;
     int result = 0;
-    int last_query_location = query_len - 1;
+    int last_query_location = query_len;
     int text_section_size = floor(text_len / 8);
     union Offset text_offset;
     text_offset.o[0] = text_section_size + (query_len-1);
