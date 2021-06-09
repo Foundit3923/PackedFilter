@@ -1,7 +1,8 @@
 // PackedFilter by Michael Olson is licensed under Attribution-NonCommercial-ShareAlike 4.0 International
 
-#include "concurrent_BM.h"
+//#include "concurrent_BM.h"
 //#include "SMART_CODE_1.h"
+#include "stable_packedfilter.h"
 
 #include <stdio.h>
 #include <string.h>
