@@ -14,11 +14,23 @@
 
 #define LAST_BITS_ON 0x101010101010101UL
 #define SIGNIFICANT_BITS_ON 0x8080808080808080UL
+
+//Unused
 #define hassetbyte(v) ((~(v) - 0x0101010101010101UL) & (v) & 0x8080808080808080UL)
+
+//Reduces fully set bytes to a byte with a 1 in the LSB position, non fully set bytes are reudced to 0
 #define reduce(v) (((~v - LAST_BITS_ON) ^ ~v) & SIGNIFICANT_BITS_ON) >> 7
+
+//Counts the number of set bits in reduced integer
 #define bitcount(q) (q + q/255) & 255
+
+//Keeps track of found matches
 #define count(v) result += bitcount(v)
+
+//Compares a character (c) to every character in (t). Results in a fully set byte when there is a match. Fully set byte is at match location.
 #define xnor(t,q,c) ~(t ^ q * (c)) & ~(t ^ LAST_BITS_ON * (c))
+
+//Unused
 #define distance(x) ffsll(x >> 1) / 8
 
 union Window {
@@ -42,6 +54,7 @@ int search_test (unsigned char* query_array,
             unsigned char* st,
             int text_len) {
 
+    //Setup
     int mismatch_move_count = 0;
     int result = 0;
     int text_offset = 0;
@@ -51,7 +64,7 @@ int search_test (unsigned char* query_array,
     unsigned char* char_ptr = &query_array[0];
     unsigned char* last_char = &query_array[query_len-1];
     unsigned char* first_char = &query_array[0];
-
+    
     union Window t_w;
     t_w.c = &st[0];
 
@@ -70,30 +83,31 @@ int search_test (unsigned char* query_array,
         bool correct = true;
     }
     */
-
+    //While the address of the first char of t_w.c is not the address of the last char of the text. 
     while(!(&*t_w.c > &st[text_len-1])) {
-          value = xnor(*t_w.i, query_matches, *char_ptr);
-          //value = ~(*t_w.i - (*char_ptr * LAST_BITS_ON));
-
+        //Compare for matches  
+        value = xnor(*t_w.i, query_matches, *char_ptr);
+        //value = ~(*t_w.i - (*char_ptr * LAST_BITS_ON));
+        
+        //(bool) catches any set bits which indicate a match
         if((bool)(query_matches = reduce(value) & query_matches)) {
-
+            
+            //If the query has finished iterating, query match is found, record and reset
             if (&char_ptr[0] == last_char) {
                 count(query_matches);
                 char_ptr = first_char;
-                //end_position = 7 - (__builtin_clzll(query_matches)/8);
-
-                //text_offset += query_len + end_position;
-                //t_w.c = &st[text_offset];
                 if(query_len > 1) {
                     t_w.c += query_len;
                 } else{
                     t_w.c += 8;
                 }
             } else {
+                //Character match found, move to next char in text and query
                 char_ptr++;
                 t_w.c++;
             }
         } else {
+            //No match found in window, move window and reset
             char_ptr = first_char;
             text_offset += 8;
             t_w.c = &st[text_offset];
