@@ -70,19 +70,7 @@ int search_test (unsigned char* query_array,
 
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
-
-/*    union Test a;
-    union Test b;
-    a.c = "abcdefghijklmnopqrstuvwxyz";
-    int diff = 'g' - 'm';
-    b.c = "ghijklmn";
-
-    int i = a.i - b.i;
-
-    if(hassetbyte(~(i - (diff * LAST_BITS_ON)))) {
-        bool correct = true;
-    }
-    */
+    
     //While the address of the first char of t_w.c is not the address of the last char of the text. 
     while(!(&*t_w.c > &st[text_len-1])) {
         //Compare for matches  
@@ -96,11 +84,6 @@ int search_test (unsigned char* query_array,
             if (&char_ptr[0] == last_char) {
                 count(query_matches);
                 char_ptr = first_char;
-                if(query_len > 1) {
-                    t_w.c += query_len;
-                } else{
-                    t_w.c += 8;
-                }
             } else {
                 //Character match found, move to next char in text and query
                 char_ptr++;
