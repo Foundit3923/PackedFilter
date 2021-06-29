@@ -51,7 +51,7 @@ union Test {
 
 int search_test (unsigned char* query_array,
             int query_len,
-            unsigned char* st,
+            unsigned char* text,
             int text_len) {
 
     //Setup
@@ -66,15 +66,15 @@ int search_test (unsigned char* query_array,
     unsigned char* first_char = &query_array[0];
     
     union Window t_w;
-    t_w.c = &st[0];
+    text_window.c = &text[0];
 
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
     
     //While the address of the first char of t_w.c is not the address of the last char of the text. 
-    while(!(&*t_w.c > &st[text_len-1])) {
+    while(!(&*text_window.c > &text[text_len-1])) {
         //Compare for matches  
-        value = xnor(*t_w.i, query_matches, *char_ptr);
+        value = xnor(*text_window.i, query_matches, *char_ptr);
         //value = ~(*t_w.i - (*char_ptr * LAST_BITS_ON));
         
         //(bool) catches any set bits which indicate a match
@@ -87,13 +87,13 @@ int search_test (unsigned char* query_array,
             } else {
                 //Character match found, move to next char in text and query
                 char_ptr++;
-                t_w.c++;
+                text_window.c++;
             }
         } else {
             //No match found in window, move window and reset
             char_ptr = first_char;
             text_offset += 8;
-            t_w.c = &st[text_offset];
+            text_window.c = &text[text_offset];
             query_matches = LAST_BITS_ON;
         }
     }
