@@ -15,9 +15,6 @@
 #define LAST_BITS_ON 0x101010101010101UL
 #define SIGNIFICANT_BITS_ON 0x8080808080808080UL
 
-//Unused
-#define hassetbyte(v) ((~(v) - 0x0101010101010101UL) & (v) & 0x8080808080808080UL)
-
 //Reduces fully set bytes to a byte with a 1 in the LSB position, non fully set bytes are reudced to 0
 #define reduce(v) (((~v - LAST_BITS_ON) ^ ~v) & SIGNIFICANT_BITS_ON) >> 7
 
@@ -55,28 +52,26 @@ int search_test (unsigned char* query_array,
             int text_len) {
 
     //Setup
-    int mismatch_move_count = 0;
     int result = 0;
-    int text_offset = 0;
-    int true_distance = 0;
-    int end_position = 0;
+    int text_offset = 0
 
     unsigned char* char_ptr = &query_array[0];
     unsigned char* last_char = &query_array[query_len-1];
     unsigned char* first_char = &query_array[0];
     
-    union Window t_w;
+    union Window text_window;
     text_window.c = &text[0];
 
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
     
-    //While the address of the first char of t_w.c is not the address of the last char of the text. 
+    //While the address of the first char of text_window.c is not the address of the last char of the text. 
     while(!(&*text_window.c > &text[text_len-1])) {
-        //Compare for matches  
+        //Check if *char_ptr matches any chars in *text_window  
         value = xnor(*text_window.i, query_matches, *char_ptr);
-        //value = ~(*t_w.i - (*char_ptr * LAST_BITS_ON));
         
+        //reduce any found matches to a single bit occupying the lsb position of a byte
+        //compare query_matches with reduce to only keep desired matches
         //(bool) catches any set bits which indicate a match
         if((bool)(query_matches = reduce(value) & query_matches)) {
             
