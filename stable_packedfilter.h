@@ -53,7 +53,7 @@ int search_test (unsigned char* query_array,
 
     //Setup
     int result = 0;
-    int text_offset = 0
+    int text_offset = 0;
 
     unsigned char* char_ptr = &query_array[0];
     unsigned char* last_char = &query_array[query_len-1];
