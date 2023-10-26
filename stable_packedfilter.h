@@ -75,17 +75,17 @@ int search_test (unsigned char* query_array,
         //(bool) catches any set bits which indicate a match
         if((bool)(query_matches = reduce(value) & query_matches)) {
             
-            //If the query has finished iterating, query match is found, record and reset
+            //If the query has finished iterating: query match is found, record and reset
             if (&char_ptr[0] == last_char) {
                 count(query_matches);
                 char_ptr = first_char;
             } else {
-                //Character match found, move to next char in text and query
+                //Character match found: move to next char in text and query
                 char_ptr++;
                 text_window.c++;
             }
         } else {
-            //No match found in window, move window and reset
+            //No match found in window: move window and reset
             char_ptr = first_char;
             text_offset += 8;
             text_window.c = &text[text_offset];
