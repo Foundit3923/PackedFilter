@@ -115,16 +115,23 @@ int search_test (unsigned char* query_array,
             // This is allowed because we have verified that there are no better options
             bc.o[0] = query_len - badchar[st[text_offset.o[0]]] * inverse_matches.c[0];
             bc.o[1] = query_len - badchar[st[text_offset.o[1]]] * inverse_matches.c[1];
-            bc.o[2] = (query_len - badchar[st[text_offset.o[2]]]) * inverse_matches.c[2];
+            bc.o[2] = query_len - badchar[st[text_offset.o[2]]] * inverse_matches.c[2];
             bc.o[3] = query_len - badchar[st[text_offset.o[3]]] * inverse_matches.c[3];
             bc.o[4] = query_len - badchar[st[text_offset.o[4]]] * inverse_matches.c[4];
             bc.o[5] = query_len - badchar[st[text_offset.o[5]]] * inverse_matches.c[5];
             bc.o[6] = query_len - badchar[st[text_offset.o[6]]] * inverse_matches.c[6];
             bc.o[7] = query_len - badchar[st[text_offset.o[7]]] * inverse_matches.c[7];
+            // There are issues doing this in parallel due to how subtraction changes bits outside the initial byte
+            // Next steps: break up subtraction into two parts. Mask out every other byte, perform subtraction, repeat, then & with ~ of the first
+            // Should reduce the number of steps 
+            //  bc.i = ((query_len * LAST_BITS_ON) - (badchar.i & ((inverse_matches.i & LAST_BITS_ON) * 255))) & (EVERY_EVEN_LAST_BITS_ON * 255)
+            //  temp = ((query_len * LAST_BITS_ON) - (badchar.i & ((inverse_matches.i & LAST_BITS_ON) * 255))) & (EVERY_ODD_LAST_BITS_ON * 255)
+            //  bc.i = temp & ~bc.i
 
-
-
+            // Setting text_offset such that each byte contains the index location for the jump
             text_offset += badchar[match_comparison];
+            // increment by text offset
+            // It may be possible to set each character to a different index of the text by assinging them different memory addresses and then iterating to the correct address adding bc.i and t_w.i 
             t_w.c = &st[text_offset];
             query_matches = LAST_BITS_ON;
         }
