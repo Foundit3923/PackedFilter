@@ -20,8 +20,16 @@
 //Reduces fully set bytes to a byte with a 1 in the LSB position, non fully set bytes are reudced to 0
 //EXPERIMENTAL
 //#define reduce(v) shift((~v - LAST_BITS_ON) & SIGNIFICANT_BITS_ON)
-#define reduce(v) (~v - LAST_BITS_ON) & SIGNIFICANT_BITS_ON
+//#define reduce(v) (~v - LAST_BITS_ON) & SIGNIFICANT_BITS_ON
+get the mask = (((v + lbo)+lbo)&v)
 
+declutter = ~(((v + lbo)+lbo)&v)&v #also removes lsb from full set bytes
+
+get lsb of full set bytes = (~(((v + lbo)+lbo)&v)&v)/254 #6 operations!!
+
+v =-8,934,850,293,326,209,008
+
+#need to try different values to check for issues
 //Counts the number of set bits in reduced integer
 #define bitcount(q) (q + q/255) & 255
 
