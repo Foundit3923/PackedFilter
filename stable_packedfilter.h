@@ -16,7 +16,8 @@
 #define SIGNIFICANT_BITS_ON 0x8080808080808080UL
 
 //Reduces fully set bytes to a byte with a 1 in the LSB position, non fully set bytes are reudced to 0
-#define reduce(v) (((~v - LAST_BITS_ON) ^ ~v) & SIGNIFICANT_BITS_ON) >> 7
+//#define reduce(v) (((~v - LAST_BITS_ON) ^ ~v) & SIGNIFICANT_BITS_ON) >> 7 Original Method
+#define reduce(v) (~(v + LAST_BITS_ON) / 128) & LAST_BITS_ON
 
 //Counts the number of set bits in reduced integer
 #define bitcount(q) (q + q/255) & 255
@@ -64,6 +65,12 @@ int search_test (unsigned char* query_array,
 
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
+    uint64_t tmp1;
+    uint64_t tmp2;
+    uint64_t tmp3;
+    uint64_t tmp4;
+    uint64_t tmp5;
+    uint64_t tmp6;
     
     //While the address of the first char of text_window.c is not the address of the last char of the text. 
     while(!(&*text_window.c > &text[text_len-1])) {
@@ -73,7 +80,7 @@ int search_test (unsigned char* query_array,
         //reduce any found matches to a single bit occupying the lsb position of a byte
         //compare query_matches with reduce to only keep desired matches
         //(bool) catches any set bits which indicate a match
-        if((bool)(query_matches = reduce(value) & query_matches)) {
+        if((bool)(reduce(value) & query_matches)) {
             
             //If the query has finished iterating: query match is found, record and reset
             if (&char_ptr[0] == last_char) {

@@ -30,7 +30,9 @@ int* rev;
 
 uint64_t full_mask[128];
 
-uint64_t anchor_check[8] = {255,65280,16711680,4278190080,1095216660480,280375465082880,71776119061217280,18374686479671624000};
+const uint64_t temp = 18374686479671624000ULL;
+
+uint64_t anchor_check[8] = {255,65280,16711680,4278190080,1095216660480,280375465082880,71776119061217280,temp};
 
 char* query;
 
@@ -99,6 +101,7 @@ double* run_tests(char* init_query, int query_len, char* init_term, int text_len
         t_w.c = (unsigned char*) &init_term[text_modifier];
 
         union Query q;
+        /*
         q.c = (unsigned char*) &init_query[0];
         for(text_modifier = 0; text_modifier < text_len; text_modifier+=8){
             t_w.c = (unsigned char*) &init_term[text_modifier];
@@ -117,6 +120,7 @@ double* run_tests(char* init_query, int query_len, char* init_term, int text_len
                 }
             }
         }
+        */
 
         int count;
         for (count = 0; count < 1; count++) {
