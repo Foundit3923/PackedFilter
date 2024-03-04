@@ -2,7 +2,10 @@
 
 //#include "concurrent_BM.h"
 //#include "SMART_CODE_1.h"
-#include "stable_packedfilter.h"
+//#include "stable_packedfilter.h"
+//#include "old_stable_packedfilter.h"
+#include "dynamic_windows.h"
+//#include "branchless.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -123,7 +126,7 @@ double* run_tests(char* init_query, int query_len, char* init_term, int text_len
         */
 
         int count;
-        for (count = 0; count < 1; count++) {
+        for (count = 0; count < 100000; count++) {
             //result = KMP_Experimental_wildcard_arbitrary_length_test(init_term, subquery, full_mask);
             /*if(count == 176305-1){
                init_query[strlen(init_query) - 1] = '\0';

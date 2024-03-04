@@ -16,7 +16,7 @@
 #define SIGNIFICANT_BITS_ON 0x8080808080808080UL
 
 //Reduces fully set bytes to a byte with a 1 in the LSB position, non fully set bytes are reudced to 0
-#define reduce(v) (~(v + LAST_BITS_ON) / 128) & LAST_BITS_ON
+#define reduce(v) (((~v - LAST_BITS_ON) ^ ~v) & SIGNIFICANT_BITS_ON) >> 7
 
 //Counts the number of set bits in reduced integer
 #define bitcount(q) (q + q/255) & 255
@@ -25,7 +25,7 @@
 #define count(v) result += bitcount(v)
 
 //Compares a character (c) to every character in (t). Results in a fully set byte when there is a match. Fully set byte is at match location.
-#define xnor(t,q,c) ~(t ^ q * (c)) & ~(t ^ LAST_BITS_ON * (c))
+#define xnor(t,q,c) ~(t ^ q * (c)) //& ~(t ^ LAST_BITS_ON * (c))
 
 //Unused
 #define distance(x) ffsll(x >> 1) / 8
@@ -64,14 +64,6 @@ int search_test (unsigned char* query_array,
 
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
-
-    int search_windows[8];
-    int eval_locations[10];
-    int match_locations[10];
-    
-    bool evalFlag = false;
-    bool compareFlag = false;
-    char* stateFlag = "";
     
     //While the address of the first char of text_window.c is not the address of the last char of the text. 
     while(!(&*text_window.c > &text[text_len-1])) {
@@ -83,17 +75,6 @@ int search_test (unsigned char* query_array,
         //(bool) catches any set bits which indicate a match
         if((bool)(query_matches = reduce(value) & query_matches)) {
             
-            switch(*stateFlag){
-              case 'eval':
-              break;
-
-              case 'compare':
-              break;
-
-              default:
-              break;
-            }
-
             //If the query has finished iterating: query match is found, record and reset
             if (&char_ptr[0] == last_char) {
                 count(query_matches);
@@ -104,9 +85,10 @@ int search_test (unsigned char* query_array,
                 text_window.c++;
             }
         } else {
-            //Search State
             //No match found in window: move window and reset
-            text_window.c++;
+            char_ptr = first_char;
+            text_offset += 8;
+            text_window.c = &text[text_offset];
             query_matches = LAST_BITS_ON;
         }
     }
@@ -114,5 +96,3 @@ int search_test (unsigned char* query_array,
     return result;
 
 }
-
-
