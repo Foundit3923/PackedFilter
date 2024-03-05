@@ -71,10 +71,11 @@ int search_test (unsigned char* query_array,
     
     bool evalFlag = false;
     bool compareFlag = false;
-    char* stateFlag = "";
+    char* modeFlag = "search";
     
     //While the address of the first char of text_window.c is not the address of the last char of the text. 
     while(!(&*text_window.c > &text[text_len-1])) {
+        //If(queue is empty)
         //Check if *char_ptr matches any chars in *text_window  
         value = xnor(*text_window.i, query_matches, *char_ptr);
         
@@ -83,11 +84,20 @@ int search_test (unsigned char* query_array,
         //(bool) catches any set bits which indicate a match
         if((bool)(query_matches = reduce(value) & query_matches)) {
             
-            switch(*stateFlag){
-              case 'eval':
+            //On match found, evaluate Mode for instructions
+            switch(modeFlag){
+              case "search":
+                modeFlag = "eval";
+                //increment everything first. This moves the matched window to the second postion in the potential match and the sets up the to-be reallocated window to continue where it left off.
+                //re-allocate a window
+
               break;
 
-              case 'compare':
+              case "eval":
+                modeFlag = "compare";
+              break;
+
+              case "compare":
               break;
 
               default:
@@ -104,6 +114,7 @@ int search_test (unsigned char* query_array,
                 text_window.c++;
             }
         } else {
+            modeFlag = "search";
             //Search State
             //No match found in window: move window and reset
             text_window.c++;

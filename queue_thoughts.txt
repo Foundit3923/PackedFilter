@@ -1,0 +1,20 @@
+Using a Queue is the current idea for dealing with multiple pattern matches at once.
+
+As I write this it feels like a very sequential way of thinking. Maybe that is needed for the first versions? Build up to fully parallel.
+
+Continuing with queues.
+
+The idea is that queuing up potential matches makes prioritizing and allocating windows into an either or statement.
+Either everything in the algorithm is searching or it enters another mode. The queue having something in it is what triggers a mode switch.
+
+The queue would be checked at the beginning of each cycle. If there is 1 match then 1 of the windows will be reallocated to evaluate it while everything else continues as normal.
+If there are more than 1 matches then that number of windows (up to 8) will be reallocated to evaluate those matches.
+
+Wait. I like the idea of reallocating windows but for the initial evaluation it needlessly complicates things while deviating from the primary objective of finding potential matches.
+The window that finds a match should check if the last character also matches. 
+
+Alternatively the idea of queuing up potential matches only if they pass a comparison against the pattern is also needlessly complicated along with the idea of chekcing the last character to 
+evaluate if it's worth the time to investigate.
+
+Upon finding a match we set an empty pointer of a Union to the address of the match. The other type in the union is a uint64_t which we use to compare the two values. If they aren't equal, 
+the potential match is tossed. Otherwise it goes in the queue. 

@@ -1,0 +1,71 @@
+What we have:
+
+matches mask:
+01010011
+00000000 00000001 00000000 00000001 00000000 00000000 00000001 00000001
+
+A string of text:
+abcdefghijklmnopqrstuvwxyz
+
+Need to grab different characters separated by n characters where n is greater than the size of the system word.
+This results in multiple pointers which need to be dereferenced each time
+Additionally the pointers are 64 bits and can't be incremented in parallel.
+must be done sequentially.
+1) increment each pointer
+2) dereference each pointer to a char
+3) store each char in a separate array at a particular location.
+
+Options:
+1) increment offset instead of pointer (done in parallel, but limits max offset to 255)
+2) dereference each pointer to a char (sequential)
+3) store each char in a separate array at a particular location (sequential). (potential for multiplying each char by a mask then ORing them together. Unsure if this will take more time)
+
+1) 
+
+
+
+
+remembering:
+multiple masks adding together or ANDing together to do something....
+After verifying the start and end of a potential match the inbetween is expected to be the same.
+Align the expected pattern with the potential match and do xnor on the whole thing.
+A mismatch results in failure and moving on.
+Potential to take the first mismatch and use it in bad char rule
+
+There is potential to compress ascii text to 7 bits to increase the number of chars fro 8 to 9 without compromising the ability to perform parallel processes
+
+/\ the above is not what I was remembering but is not wrong.
+Was remembering method of increasing match speeds of queues.
+If queuing up potential matches, I could AND them together since they should all technially be the same. If there is a mismatch then additional processing is needed.
+Initial queue item could be the pattern. AND with potential match then eval for equivalence. 
+Any mismatches POP the potential match and we continue on our way.
+Scratch that. Just have matching the first 8 bytes as the condition for PUSHing the potential match to the queue unless that comparison includes the rest of the pattern.
+Potential matches that don't pass aren't pushed. This should be a constant time process. (get address, deref, eval, PUSH).
+
+
+
+What is happening when a pointer is incremented by 1?
+
+0 -> 1
+OR
+1 -> 10
+
+Can you have a "prefix" for a memory location and just tack on a small portion that you update? Is this viable? Is this FASTER?
+i.e.
+unsigned char* mem_prefix = 10100100 00101110 01110101 00111011 10001010 10100010 10100010 00000000 <- OR in the last byte
+uint_8* offsets = {0,7,15,23,31,39,47,55}
+uint_64 matches = 00000000 00000001 00000000 00000001 00000000 00000000 00000001 00000001
+
+
+Issues:
+Offests wouldn't be the numbers here they would be n + base where n is the numbers shown and base is the original last byte.
+Since the last byte isn't starting at 0 there is the potential for it to reach 255 before n does which would cause any subsequent increases to influence higher order bytes resulting in multiple mem_prefixes and several other issues.
+
+Solutions:
+Reserve space at a specific location so that the last byte is 0.
+Do something interesting so that each mem address occupies an array. We could adjust it so that we only see the last byte of each "array" and perform arithmatic on it in parallel. (prob won't work)
+
+More Issues:
+the overflow issue could go all the way up to the highest order so there's no way to only operate on a sub-section that will be changing.
+Reserving space only works once. since the offsets are restricted to 255 the text will likely need to be split into many sections to accomodate this. There's no way to make every section's address have 0 as the last byte.
+
