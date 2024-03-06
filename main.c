@@ -2,9 +2,9 @@
 
 //#include "concurrent_BM.h"
 //#include "SMART_CODE_1.h"
-//#include "stable_packedfilter.h"
+#include "stable_packedfilter.h"
 //#include "old_stable_packedfilter.h"
-#include "dynamic_windows_3.h"
+//#include "dynamic_windows_3.h"
 //#include "branchless.h"
 
 #include <stdio.h>

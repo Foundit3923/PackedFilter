@@ -9,3 +9,26 @@ Shift all bytes with active bits to the rightmost position:
     uint64_t match_comparison = isolated_chars / left_mask ;
 
 ------------------------------------------------------------------------------------------------------------------------
+
+Arithmatic left shift:
+left shifts bits and introduces an active bit in the lsb position
+n - ~n
+
+------------------------------------------------------------------------------------------------------------------------
+
+Find the leftmost character match:
+(Little Endian only)
+Index value provided begins at 0. So a 4th order byte would produce the value 3.
+a = matches * -255 
+b= a & LBO
+c = ~(b & (a>>1)) & b
+d = c * -255
+e = LBO & ~d 
+f = (e/255) & 255
+
+find the second leftmost character match in little endian:
+a = matches + matches/255
+b = (a & 255)-2
+c = a XOR (b * LBO)
+d = (c>> 7) & LBO
+e = (d+d/255) & 255
