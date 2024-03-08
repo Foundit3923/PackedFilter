@@ -1,0 +1,50 @@
+Terms:
+text:
+pattern:
+n: the length of text 
+m: the length of pattern
+multiTextWindow:
+searchPattern:
+XNOR:
+match/matches:
+modeFlag:
+potential match: a section of text that has satisfied some of the pattern requirements
+window: one of eight windows each evaluating separate sections of the text
+cycle: each execution of the while loop is a single cycle
+mRemaining: the number of characters remaining in pattern when a match is found in evalMode
+pAlignPos: the location that a window should be aligned with when a potential match has been verified
+
+Steps:
+
+assemble multiTextWindow
+assemble searchPattern
+XNOR to check for matches
+
+if match
+  check modeFlag
+    if searchMode
+      set modeFlag to evalMode
+      increment everything first 
+      set the window that matched to evaluate the last char in the potential match on the next cycle and save the last window and pattern position in pAlignPos.
+
+    if evalMode
+      set modeFlag to compareMode
+      increment evererything first
+      identify the number of characters left to evaluate in pattern (should be m-2).
+      if mRemaining <= 8 && no mismatch
+        assign that number of windows to evaluate the text 
+      else if mRemaining > 8 && no mismatch
+        assign all windows to evaluate text
+
+    if compareMode
+      if mRemaining <= 8 && no mismatch
+        assign that number of windows to evaluate the text 
+      else if mRemaining > 8 && no mismatch
+        assign all windows to evaluate text
+      if mRemaining == 0 && no mismatch
+        set modeFlag to searchMode
+        store match of pAlignPos - 1
+        reset all reallocated windows to previous locations
+else no match
+  set modeFlag to searchMode
+  increment everything 

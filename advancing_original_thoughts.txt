@@ -1,0 +1,2 @@
+the original wastes a lot of parallel processing power by only exploring those characters who match and continue to match by way of a static mask that records values and indicates where 
+an expected match will be found. 

@@ -25,7 +25,7 @@
 #define count(v) result += bitcount(v)
 
 //Compares a character (c) to every character in (t). Results in a fully set byte when there is a match. Fully set byte is at match location.
-#define xnor(t,q,c) ~(t ^ q * (c)) & ~(t ^ LAST_BITS_ON * (c))
+#define xnor(t,c) ~(t ^ c) 
 
 //Unused
 #define distance(x) ffsll(x >> 1) / 8
@@ -46,6 +46,26 @@ union Test {
     uint64_t i;
 };
 
+union Pattern {
+    unsigned char* c[8];
+    //char l[8];
+    uint64_t* i;
+};
+
+Pattern setSearchPattern(Pattern searchPattern, unsigned char* query_array, int[] pattern_locations){
+    for(int i=0; i < 8; i++){
+      searchPattern.c[i] = query_array[pattern_locations[i]];
+    }
+    return searchPattern;
+}
+
+Window setMultiTextWindow(Window text_window, unsigned char* text, int[] window_locations){
+    for(int i=0; i < 8; i++){
+      text_window.c[i] = text[window_locations[i]];
+    }
+    return text_window;
+}
+
 int search_test (unsigned char* query_array,
             int query_len,
             unsigned char* text,
@@ -62,6 +82,8 @@ int search_test (unsigned char* query_array,
     union Window text_window;
     text_window.c = &text[0];
 
+    union Pattern searchPattern;
+
     uint64_t query_matches = LAST_BITS_ON;
     uint64_t value;
 
@@ -75,9 +97,10 @@ int search_test (unsigned char* query_array,
     
     //While the address of the first char of text_window.c is not the address of the last char of the text. 
     while(!(&*text_window.c > &text[text_len-1])) {
-        //If(queue is empty)
+        searchPattern = setSearchPattern(searchPattern, query_array, pattern_locations);
+        text_window = setMultiTextWindow(text_window, text, window_locations);
         //Check if *char_ptr matches any chars in *text_window  
-        value = xnor(*text_window.i, query_matches, *char_ptr);
+        value = xnor(*text_window.i, query_matches, *searchPattern.i);
         
         //reduce any found matches to a single bit occupying the lsb position of a byte
         //compare query_matches with reduce to only keep desired matches
@@ -88,8 +111,9 @@ int search_test (unsigned char* query_array,
             switch(modeFlag){
               case "search":
                 modeFlag = "eval";
-                //increment everything first. This moves the matched window to the second postion in the potential match and the sets up the to-be reallocated window to continue where it left off.
-                //re-allocate a window
+                //increment everything first 
+
+                //set the window that matched to evaluate the last char in the potential match on the next cycle and save the last window and pattern position in pAlignPos.
 
               break;
 
